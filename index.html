@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BloodShield EV — McMaster iGEM</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0b0b0f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  #shell{width:100%;height:100vh;display:flex;flex-direction:column;background:#0b0b0f}
+
+  #top{flex-shrink:0;height:86px;display:flex;align-items:center;justify-content:space-between;padding:0 36px;border-bottom:1px solid rgba(255,255,255,0.07)}
+  #th{display:flex;flex-direction:column;gap:6px}
+  #ttitle{font-size:34px;font-weight:700;color:#fff;letter-spacing:-0.03em}
+  #tsub{font-size:12px;color:rgba(255,255,255,.5);max-width:680px;line-height:1.4}
+  #tbadge{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#b8b3f5;background:rgba(127,119,221,.14);border:1px solid rgba(127,119,221,.3);border-radius:30px;padding:6px 16px}
+
+  #body{flex:1;min-height:0;display:grid;grid-template-columns:1fr 290px}
+
+  #cbox{position:relative;min-height:0;overflow:hidden}
+  #c{position:absolute;top:0;left:0;width:100%;height:100%}
+  #hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(255,255,255,.18);letter-spacing:.06em;pointer-events:none;white-space:nowrap}
+
+  #sb{border-left:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;padding:28px 22px;overflow:hidden}
+  .shead{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:14px}
+
+  .cb{width:100%;display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:11px;border:1px solid transparent;background:transparent;cursor:pointer;text-align:left;transition:background .12s,border-color .12s}
+  .cb:hover{background:rgba(255,255,255,.05)}
+  .cb.on{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.13)}
+  .cb+.cb{margin-top:3px}
+  .dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+  .cn{font-size:13px;font-weight:600;color:rgba(255,255,255,.9);display:block;line-height:1.3}
+  .cs{font-size:11px;color:rgba(255,255,255,.35);display:block;margin-top:3px}
+
+  #rule{height:1px;background:rgba(255,255,255,.06);margin:18px 0;flex-shrink:0}
+
+  #ip{flex:1;display:flex;flex-direction:column;justify-content:flex-end;min-height:0}
+  #in{font-size:15px;font-weight:700;color:#fff;line-height:1.4}
+  #ib{font-size:12px;color:rgba(255,255,255,.5);margin-top:9px;line-height:1.7}
+
+  #bot{flex-shrink:0;height:62px;display:flex;align-items:center;gap:10px;padding:0 28px;border-top:1px solid rgba(255,255,255,.06)}
+  #ml{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.2);white-space:nowrap;margin-right:6px}
+
+  .mb{flex:1;height:40px;display:flex;align-items:center;justify-content:center;gap:9px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);font-size:12px;font-weight:600;color:rgba(255,255,255,.45);cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap}
+  .mb:hover{background:rgba(255,255,255,.09);color:#fff;border-color:rgba(255,255,255,.22)}
+  .mb.on{background:rgba(127,119,221,.22);color:#d0ccff;border-color:rgba(160,154,238,.52)}
+  .mn{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);flex-shrink:0;transition:all .15s}
+  .mb:hover .mn{background:rgba(255,255,255,.15);color:#fff}
+  .mb.on .mn{background:rgba(160,154,238,.38);color:#fff}
+
+  #rb{height:40px;padding:0 18px;border-radius:9px;border:1px solid rgba(255,255,255,.07);background:transparent;font-size:11px;font-weight:500;color:rgba(255,255,255,.25);cursor:pointer;font-family:inherit;transition:all .13s;white-space:nowrap}
+  #rb:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.65)}
+</style>
+</head>
+<body>
+
+<div id="shell">
+  <div id="top">
+    <div id="th">
+      <span id="ttitle">BloodShield EV</span>
+      <span id="tsub">Engineered extracellular vesicle concept for pathogen capture, localized inactivation, and magnetic removal from blood products.</span>
+    </div>
+    <span id="tbadge">McMaster iGEM &times; Shad</span>
+  </div>
+
+  <div id="body">
+    <div id="cbox">
+      <canvas id="c"></canvas>
+      <div id="hint">drag to rotate</div>
+    </div>
+
+    <div id="sb">
+      <div class="shead">Components</div>
+
+      <button class="cb on" id="ba" onclick="ft('all',this)">
+        <div class="dot" style="background:#7F77DD"></div>
+        <div><span class="cn">Full structure</span><span class="cs">All surface components</span></div>
+      </button>
+      <button class="cb" onclick="ft('scaffold',this)">
+        <div class="dot" style="background:#1D9E75"></div>
+        <div><span class="cn">Lamp2b / CD63</span><span class="cs">Membrane scaffold protein</span></div>
+      </button>
+      <button class="cb" onclick="ft('scfv',this)">
+        <div class="dot" style="background:#378ADD"></div>
+        <div><span class="cn">scFv targeting arms</span><span class="cs">Malaria &middot; HepB &middot; Flavivirus</span></div>
+      </button>
+      <button class="cb" onclick="ft('photo',this)">
+        <div class="dot" style="background:#EF9F27"></div>
+        <div><span class="cn">Photosensitizer</span><span class="cs">Chlorin e6 analogue</span></div>
+      </button>
+      <button class="cb" onclick="ft('spion',this)">
+        <div class="dot" style="background:#E24B4A"></div>
+        <div><span class="cn">SPION tags</span><span class="cs">Magnetic removal</span></div>
+      </button>
+
+      <div id="rule"></div>
+
+      <div id="ip">
+        <div id="in">Hover a component</div>
+        <div id="ib">Select a component or mechanism step to see how the platform works.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bot">
+    <span id="ml">Mechanism</span>
+    <button class="mb" onclick="sm(0,this)"><span class="mn">1</span>Target capture</button>
+    <button class="mb" onclick="sm(1,this)"><span class="mn">2</span>Inactivation</button>
+    <button class="mb" onclick="sm(2,this)"><span class="mn">3</span>Removal</button>
+    <button id="rb" onclick="rv()">Reset</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const cbox = document.getElementById('cbox');
+const cv   = document.getElementById('c');
+const scene = new THREE.Scene();
+let cam, ren;
+
+function setup() {
+  const W = cbox.clientWidth, H = cbox.clientHeight;
+  if (!W || !H) { requestAnimationFrame(setup); return; }
+
+  cv.width  = W * devicePixelRatio;
+  cv.height = H * devicePixelRatio;
+
+  ren = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: false });
+  ren.setSize(W, H);
+  ren.setPixelRatio(Math.min(devicePixelRatio, 2));
+  ren.setClearColor(0x0b0b0f, 1);
+  ren.outputEncoding = THREE.sRGBEncoding;
+  ren.physicallyCorrectLights = true;
+
+  cam = new THREE.PerspectiveCamera(36, W / H, 0.1, 100);
+  cam.position.set(0, 0, 6.4);
+
+  build();
+  loop();
+}
+
+window.addEventListener('resize', () => {
+  if (!ren || !cam) return;
+  const W = cbox.clientWidth, H = cbox.clientHeight;
+  if (!W || !H) return;
+  cv.width  = W * devicePixelRatio;
+  cv.height = H * devicePixelRatio;
+  ren.setSize(W, H);
+  cam.aspect = W / H;
+  cam.updateProjectionMatrix();
+});
+
+const OP = 0.82;
+const evMat = new THREE.MeshPhysicalMaterial({ color:0x6e55cc, transparent:true, opacity:OP, transmission:0.08, roughness:0.35, metalness:0.0, clearcoat:0.25, clearcoatRoughness:0.4, side:THREE.FrontSide });
+const G   = { scaffold:[], scfv:[], photo:[], spion:[] };
+const AO  = [];
+const sM  = new THREE.MeshPhysicalMaterial({ color:0x1D9E75, roughness:0.42, metalness:0.0, clearcoat:0.18, clearcoatRoughness:0.5 });
+const fM  = new THREE.MeshPhysicalMaterial({ color:0x378ADD, roughness:0.36, metalness:0.0, clearcoat:0.2, clearcoatRoughness:0.45 });
+const pM  = new THREE.MeshPhysicalMaterial({ color:0xEF9F27, roughness:0.3, metalness:0.0, clearcoat:0.22, clearcoatRoughness:0.38 });
+const xM  = new THREE.MeshPhysicalMaterial({ color:0xE24B4A, roughness:0.28, metalness:0.0, clearcoat:0.18, clearcoatRoughness:0.4 });
+const BM  = { scaffold:sM, scfv:fM, photo:pM, spion:xM };
+const FL  = ['Malaria (PfEMP1 target)', 'Hepatitis B (HBsAg target)', 'Flavivirus (E-protein target)'];
+
+function mk(geo, mat) { return new THREE.Mesh(geo, mat); }
+
+function fib(n, r) {
+  const p = [], g = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < n; i++) {
+    const y = 1 - (i / (n - 1)) * 2, rd = Math.sqrt(Math.max(0, 1 - y * y));
+    p.push(new THREE.Vector3(r * rd * Math.cos(g * i), r * y, r * rd * Math.sin(g * i)));
+  }
+  return p;
+}
+
+function ad(a, b) { return Math.acos(Math.min(1, a.clone().normalize().dot(b.clone().normalize()))); }
+
+function gsp(pool, ex, n) {
+  const ch = [], p = [...pool];
+  for (let c = 0; c < n; c++) {
+    let bi = 0, bd = -1;
+    for (let i = 0; i < p.length; i++) {
+      let md = Infinity;
+      for (const e of [...ex, ...ch]) { const d = ad(p[i], e); if (d < md) md = d; }
+      if (md > bd) { bd = md; bi = i; }
+    }
+    ch.push(p[bi]); p.splice(bi, 1);
+  }
+  return ch;
+}
+
+function build() {
+  scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+
+  const key = new THREE.DirectionalLight(0xffffff, 1.1);
+  key.position.set(4, 5, 6);
+  scene.add(key);
+
+  const fill = new THREE.DirectionalLight(0x8f7dff, 0.35);
+  fill.position.set(-3, 1, 2);
+  scene.add(fill);
+
+  const rim = new THREE.DirectionalLight(0x4c6fff, 0.28);
+  rim.position.set(-4, 2, -4);
+  scene.add(rim);
+
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.35, 64, 64), evMat));
+
+  const POOL = fib(300, 1.36);
+  const cS = gsp(POOL, [], 28);
+  const cF = gsp(POOL, cS, 12);
+  const cP = gsp(POOL, [...cS, ...cF], 14);
+  const cX = gsp(POOL, [...cS, ...cF, ...cP], 10);
+
+  cS.forEach(pos => {
+    const m = mk(new THREE.SphereGeometry(0.048, 10, 10), sM);
+    m.position.copy(pos);
+    m.userData = { label:'Lamp2b / CD63 scaffold', desc:'Membrane-anchoring protein that displays targeting ligands on the EV surface. Enables modular attachment of scFv arms.', type:'scaffold' };
+    scene.add(m); G.scaffold.push(m); AO.push(m);
+  });
+
+  cF.forEach((pos, i) => {
+    const g = new THREE.Group();
+    g.position.copy(pos); g.lookAt(pos.clone().multiplyScalar(3));
+    const st = mk(new THREE.CylinderGeometry(0.016, 0.016, 0.2, 8), fM);
+    st.rotation.x = Math.PI / 2; st.position.z = 0.1; g.add(st);
+    [-0.055, 0.055].forEach(dx => {
+      const a = mk(new THREE.CylinderGeometry(0.013, 0.013, 0.13, 8), fM);
+      a.rotation.x = Math.PI / 2; a.rotation.z = dx * 2.8; a.position.set(dx * 1.1, 0, 0.25); g.add(a);
+      const t = mk(new THREE.SphereGeometry(0.028, 8, 8), fM);
+      t.position.set(dx * 1.6, 0, 0.32); g.add(t);
+    });
+    g.userData = { label:'scFv targeting arm', desc:FL[i % 3], type:'scfv' };
+    g.traverse(c => { if (c !== g) c.userData = g.userData; });
+    scene.add(g); G.scfv.push(g); AO.push(g);
+  });
+
+  cP.forEach(pos => {
+    const m = mk(new THREE.TorusGeometry(0.052, 0.016, 10, 20), pM);
+    m.position.copy(pos); m.lookAt(pos.clone().multiplyScalar(3));
+    m.userData = { label:'Photosensitizer (chlorin e6)', desc:'Membrane-embedded dye activated by light. Generates singlet oxygen for spatially confined pathogen inactivation at the EV-target interface.', type:'photo' };
+    scene.add(m); G.photo.push(m); AO.push(m);
+  });
+
+  cX.forEach(pos => {
+    const g = new THREE.Group(); g.position.copy(pos);
+    [[-0.038,-0.038,0],[0.038,-0.038,0],[0,0.04,0],[0,0,0.048],[-0.02,0.02,0.035],[0.02,0.02,0.035]].forEach(([x,y,z]) => {
+      const s = mk(new THREE.SphereGeometry(0.033, 8, 8), xM); s.position.set(x, y, z); g.add(s);
+    });
+    g.userData = { label:'SPION tag', desc:'Superparamagnetic iron oxide nanoparticle cluster. Enables magnetic separation to pull EV-pathogen complexes from the blood unit before final release.', type:'spion' };
+    g.traverse(c => { if (c !== g) c.userData = g.userData; });
+    scene.add(g); G.spion.push(g); AO.push(g);
+  });
+}
+
+const SC = {
+  0: { show:['scaffold','scfv'], label:'Step 1 \u2014 Target capture',    desc:'scFv arms bind pathogen-specific surface antigens (PfEMP1, HBsAg, viral E-protein). Lamp2b/CD63 scaffold anchors targeting ligands to the EV membrane.' },
+  1: { show:['photo'],           label:'Step 2 \u2014 Local inactivation', desc:'Light activates the chlorin e6 photosensitizer. Singlet oxygen is generated at the EV-pathogen interface for spatially confined pathogen inactivation.' },
+  2: { show:['spion'],           label:'Step 3 \u2014 Magnetic removal',   desc:'SPION tags enable magnetic separation. EV-pathogen complexes are physically extracted from the blood unit before final product release.' }
+};
+
+function si(n, b) { document.getElementById('in').textContent = n; document.getElementById('ib').textContent = b; }
+
+function rbm() {
+  G.scaffold.forEach(m => { m.material = sM; });
+  G.scfv.forEach(g => g.traverse(c => { if (c.isMesh) c.material = fM; }));
+  G.photo.forEach(m => { m.material = pM; });
+  G.spion.forEach(g => g.traverse(c => { if (c.isMesh) c.material = xM; }));
+}
+
+function ft(type, btn) {
+  document.querySelectorAll('.cb').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  document.querySelectorAll('.mb').forEach(s => s.classList.remove('on'));
+  rbm();
+  const all = type === 'all';
+  evMat.opacity = all ? OP : 0.42;
+  Object.entries(G).forEach(([k, arr]) => arr.forEach(m => { m.visible = all || k === type; }));
+  if (all) si('System overview', 'Use the component list or the 3-step mechanism bar to walk your audience through capture, inactivation, and removal.');
+}
+
+function sm(n, btn) {
+  document.querySelectorAll('.mb').forEach(s => s.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.cb').forEach(b => b.classList.remove('on'));
+  document.getElementById('ba').classList.add('on');
+  const cfg = SC[n]; evMat.opacity = 0.5;
+  Object.entries(G).forEach(([k, arr]) => {
+    const show = cfg.show.includes(k);
+    arr.forEach(obj => {
+      obj.visible = true;
+      obj.traverse(c => {
+        if (c.isMesh && c.material) {
+          const m = BM[k] ? BM[k].clone() : c.material.clone();
+          m.transparent = true; m.opacity = show ? 1 : 0.02; c.material = m;
+        }
+      });
+    });
+  });
+  si(cfg.label, cfg.desc);
+}
+
+function rv() {
+  document.querySelectorAll('.mb').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.cb').forEach(b => b.classList.remove('on'));
+  document.getElementById('ba').classList.add('on');
+  evMat.opacity = OP; rbm();
+  Object.values(G).forEach(arr => arr.forEach(m => { m.visible = true; }));
+  si('System overview', 'Use the component list or the 3-step mechanism bar to walk your audience through capture, inactivation, and removal.');
+}
+
+let drag = false, prev = { x:0, y:0 }, autoRot = true, idle = null;
+function startIdle() { clearTimeout(idle); idle = setTimeout(() => { autoRot = true; }, 2500); }
+
+cv.addEventListener('mousedown', e => { drag = true; autoRot = false; clearTimeout(idle); prev = { x:e.clientX, y:e.clientY }; });
+window.addEventListener('mouseup', () => { if (drag) { drag = false; startIdle(); } });
+cv.addEventListener('mousemove', e => {
+  if (drag) {
+    scene.rotation.y += (e.clientX - prev.x) * 0.007;
+    scene.rotation.x += (e.clientY - prev.y) * 0.007;
+    prev = { x:e.clientX, y:e.clientY };
+  }
+  const r  = cv.getBoundingClientRect();
+  const mx = ((e.clientX - r.left) / r.width)  * 2 - 1;
+  const my = -((e.clientY - r.top)  / r.height) * 2 + 1;
+  const ray = new THREE.Raycaster(); ray.setFromCamera({ x:mx, y:my }, cam);
+  const ms = []; AO.forEach(o => { if (o.isMesh) ms.push(o); else o.traverse(c => { if (c.isMesh) ms.push(c); }); });
+  const hits = ray.intersectObjects(ms);
+  if (hits.length && hits[0].object.userData.label) {
+    const d = hits[0].object.userData; si(d.label, d.desc); cv.style.cursor = 'pointer';
+  } else cv.style.cursor = 'default';
+});
+
+let t = 0;
+function loop() {
+  requestAnimationFrame(loop); t += 0.008;
+  if (autoRot) scene.rotation.y += 0.003;
+  G.photo.forEach((m, i) => { m.rotation.z = t * 0.6 + i * 0.45; });
+  if (ren && cam) ren.render(scene, cam);
+}
+
+setup();
+</script>
+</body>
+</html>
